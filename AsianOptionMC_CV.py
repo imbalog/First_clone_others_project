@@ -58,21 +58,19 @@ class AsianOptionMC_MC(object):
     @property
     def price_path(self, seed = 100):
         np.random.seed(seed)
-        price_path = (self.S0 *
-                      np.cumprod (np.exp ((self.r - 0.5 * self.sigma ** 2) * self.time_unit +
-                                    self.sigma * np.sqrt(self.time_unit)
+        price_path = (self.S0 * /
+                      np.cumprod (np.exp ((self.r - 0.5 * self.sigma ** 2) * self.time_unit + /
+                                    self.sigma * np.sqrt(self.time_unit) /
                                           * np.random.randn(self.simulations, self.M)), 1))
-
-        #print np.mean(price_path,1).shape
         return price_path
 
     @property
     def value(self):
         if self.option_type == 'call':
-            MCvalue = np.mean(np.exp(-self.r * self.T)
+            MCvalue = np.mean(np.exp(-self.r * self.T) /
                               * np.maximum(np.mean(self.price_path,1)-self.strike, 0))
         else:
-            MCvalue = np.mean(np.exp(-self.r * self.T)
+            MCvalue = np.mean(np.exp(-self.r * self.T) /
                               * np.maximum(self.strike - np.mean(self.price_path,1), 0))
 
         upper_bound = MCvalue + 1.96 * MCvalue/np.sqrt(self.simulations)
