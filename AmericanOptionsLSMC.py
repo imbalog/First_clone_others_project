@@ -38,10 +38,10 @@ class AmericanOptionsLSMC(object):
     @property
     def MCprice_matrix(self):
         """ Returns MC price matrix rows: time columns: price-path simulation """
-        np.random.seed(150000)
+        np.random.seed(123)
         MCprice_matrix = np.zeros((self.M + 1, self.simulations),dtype=np.float64)
         MCprice_matrix[0,:] = self.S0
-        for t in xrange(1, int(self.M) + 1):
+        for t in xrange(1, self.M + 1):
             ran = np.random.standard_normal( self.simulations / 2)
             ran = np.concatenate((ran, -ran))
             MCprice_matrix[t, :] = (MCprice_matrix[t - 1, :]
@@ -63,7 +63,7 @@ class AmericanOptionsLSMC(object):
     @property
     def value_vector(self):
         value_matrix = np.zeros_like(self.MCpayoff)
-        value_matrix[-1,:] = self.MCpayoff[-1,:]
+        value_matrix[-1, :] = self.MCpayoff[-1, :]
         for t in range(self.M - 1, 0 , -1):
             regression = np.polyfit(self.MCprice_matrix[t, :], value_matrix[t + 1, :] * self.discount, 5)
             continuation_value = np.polyval(regression, self.MCprice_matrix[t, :])
@@ -74,6 +74,7 @@ class AmericanOptionsLSMC(object):
         return value_matrix[1,:] * self.discount
 
 
+    @property
     def LSMC_value(self): return np.sum(self.value_vector) / self.simulations
 
 
