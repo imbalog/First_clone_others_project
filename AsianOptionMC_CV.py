@@ -32,48 +32,61 @@ class AsianOptionMC_MC(object):
         if S0 < 0 or strike < 0 or T <= 0 or r < 0 or div < 0 or sigma < 0:
             raise ValueError('Error: Negative inputs not allowed')
 
-        self.time_unit = self.T / self.M
-        self.discount = np.exp(-self.r * self.time_unit)
+        self.time_unit = self.T / float(self.M)
+        self.discount = np.exp(- self.r * self.T)
 
     @property
     def GeometricAsianOption(self):
-
-        sigsqT = (self.sigma ** 2 * self.T *
-                  (self.time_unit + 1) * (2 * self.time_unit + 1)
-                  / (6 * self.time_unit * self.time_unit))
+        sigsqT = ((self.sigma ** 2 * self.T * (self.M + 1) * (2 * self.M + 1))
+                  / (6 * self.M * self.M))
         muT = (0.5 * sigsqT + (self.r - 0.5 * self.sigma ** 2)
-               * self.T * (self.time_unit + 1) / (2 * self.time_unit))
-
-        d1 = (np.log(self.S0 / self.strike) + (muT + 0.5 * sigsqT)
-              / (np.sqrt(sigsqT)))
+               * self.T * (self.M + 1) / (2 * self.M))
+        d1 = ((np.log(self.S0 / self.strike) + (muT + 0.5 * sigsqT))
+              / np.sqrt(sigsqT))
         d2 = d1 - np.sqrt(sigsqT)
-
         N1 = 0.5 * (1 + erf(d1 / np.sqrt(2)))
         N2 = 0.5 * (1 + erf(d2 / np.sqrt(2)))
-
-        geometric_value = np.exp(-self.r * self.T) * (self.S0 * np.exp(muT) * N1 - self.strike * N2)
-
+        geometric_value = self.discount * (self.S0 * np.exp(muT) * N1 - self.strike * N2)
         return geometric_value
 
     @property
     def price_path(self, seed = 100):
         np.random.seed(seed)
-        price_path = (self.S0 * /
+        price_path = (self.S0 *
                       np.cumprod (np.exp ((self.r - 0.5 * self.sigma ** 2) * self.time_unit + /
                                     self.sigma * np.sqrt(self.time_unit) /
                                           * np.random.randn(self.simulations, self.M)), 1))
         return price_path
 
     @property
-    def value(self):
+    def MCPayoff(self): 
         if self.option_type == 'call':
-            MCvalue = np.mean(np.exp(-self.r * self.T) /
-                              * np.maximum(np.mean(self.price_path,1)-self.strike, 0))
+            MCpayoff = self.discount \
+                              * np.maximum(np.mean(self.price_path,1)-self.strike, 0)
         else:
-            MCvalue = np.mean(np.exp(-self.r * self.T) /
-                              * np.maximum(self.strike - np.mean(self.price_path,1), 0))
-
-        upper_bound = MCvalue + 1.96 * MCvalue/np.sqrt(self.simulations)
-        lower_bound = MCvalue - 1.96 * MCvalue/np.sqrt(self.simulations)
+            MCpayoff = self.discount \
+                              * np.maximum(self.strike - np.mean(self.price_path,1), 0)
+        return MCpayoff
+    
+    @property 
+    def value(self):
+        MCvalue = np.mean(self.MCPayoff)
+        MCValue_std = np.std(self.MCPayoff)
+        upper_bound = MCvalue + 1.96 * MCValue_std/np.sqrt(self.simulations)
+        lower_bound = MCvalue - 1.96 * MCValue_std/np.sqrt(self.simulations)
         return MCvalue, lower_bound, upper_bound
-
+    
+    @property
+    def value_with_control_variate(self):
+        
+        geometric_average = np.exp( (1/float(self.M)) * np.sum(np.log(self.price_path), 1) )
+        if self.option_type == 'call':
+            MCpayoff_geometric = self.discount * np.maximum(geometric_average - self.strike, 0)
+        else:
+            MCpayoff_geometric = self.discount * np.maximum(self.strike - geometric_average, 0)
+        value_with_CV = self.MCPayoff + self.GeometricAsianOption - MCpayoff_geometric        
+        value_with_control_variate = np.mean(value_with_CV , 0)
+        value_with_control_variate_std = np.std(value_with_CV, 0)
+        upper_bound_CV = value_with_control_variate + 1.96 * value_with_control_variate_std/np.sqrt(self.simulations)
+        lower_bound_CV = value_with_control_variate - 1.96 * value_with_control_variate_std/np.sqrt(self.simulations)        
+        return value_with_control_variate, lower_bound_CV, upper_bound_CV
