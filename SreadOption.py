@@ -55,12 +55,13 @@ class margrabe(SpreadOption):
 
     @property
     def price(self):
-        vol = self.vol1 ** 2 + self.vol2 ** 2 - 2 * self.rho* self.vol1 * self.vol2
-        d0 = (np.log(self.S2_t / self.S1_t) / (vol * np.sqrt(self.T)) - 0.5 * vol * np.sqrt(self.T))
-        d1 = d0 + vol * np.sqrt(self.T)
+        vol = np.sqrt(self.vol1 ** 2 + self.vol2 ** 2 - 2 * self.rho * self.vol1 * self.vol2)
+        d1 = ( np.log(self.S2_t / self.S1_t) / (vol * np.sqrt(self.T)) + 0.5 * vol * np.sqrt(self.T))
+        d2 = d1 - vol * np.sqrt(self.T)
         price = (self.CallPut * (self.S2_t  * norm.cdf(self.CallPut * d1, 0, 1)
-                                  - self.S1_t * norm.cdf(self.CallPut * d0, 0, 1)))
+                                  - self.S1_t * norm.cdf(self.CallPut * d2, 0, 1)))
         return price
+
 
 class kirk(SpreadOption):
     def __init__ (self, S1_t, S2_t, K, T, r, vol1, vol2, rho, CallPut):
@@ -68,12 +69,49 @@ class kirk(SpreadOption):
 
     @property
     def price(self):
-        z = self.S1_t / (self.S1_t + self.K * np.exp(-self.r * self.T))
-        vol = self.vol1 ** 2 * z + self.vol2 ** 2 - 2 * self.rho* self.vol1 * z * self.vol2
-        d0 = (np.log(self.S2_t / (self.S1_t + self.K * np.exp(-self.r * self.T)))
-              / (vol * np.sqrt(self.T))
-              - 0.5 * vol * np.sqrt(self.T))
-        d1 = d0 + vol * np.sqrt(self.T)
+
+        z = self.S1_t / (self.S1_t + self.K * np.exp(-1. * self.r * self.T))
+
+        vol = np.sqrt( self.vol1 ** 2 * z ** 2 + self.vol2 ** 2 - 2 * self.rho* self.vol1 * self.vol2 * z )
+        d1 = (np.log(self.S2_t / (self.S1_t + self.K * np.exp(-self.r * self.T)))
+              / (vol * np.sqrt(self.T)) + 0.5 * vol * np.sqrt(self.T))
+        d2 = d1 - vol * np.sqrt(self.T)
         price = (self.CallPut * (self.S2_t  * norm.cdf(self.CallPut * d1, 0, 1)
-                                  - self.S1_t * norm.cdf(self.CallPut * d0, 0, 1)))
+                                 - (self.S1_t + self.K * np.exp(-self.r * self.T))
+                                 * norm.cdf(self.CallPut * d2, 0, 1)))
+        return price
+
+class montecarlo(SpreadOption):
+
+    def __init__ (self, S1_t, S2_t, K, T, r, vol1, vol2, rho, CallPut, simulations):
+        SpreadOption.__init__(self, S1_t, S2_t, K, T, r, vol1, vol2, rho, CallPut, "Monte Carlo")
+        self.simulations = int(simulations)
+        try:
+            if self.simulations > 0 :
+                assert isinstance(self.simulations, int)
+        except:
+            raise ValueError("Simulation's number has to be positive integer")
+
+    def generate_spreads(self, seed = 12345678 ):
+        try:
+            if seed is not None:
+                assert isinstance(seed, int)
+        except:
+            print 'Error passing seed'
+        np.random.seed(seed)
+        B1 = np.sqrt(self.T) * np.random.randn(self.simulations, 1)
+        B2 = np.sqrt(self.T) * np.random.randn(self.simulations, 1)
+        S1_T = self.S1_t * np.exp ((self.r - 0.5 * self.vol1 ** 2) * self.T + self.vol1 *  B1)
+        S2_T = self.S2_t * np.exp ((self.r - 0.5 * self.vol2 ** 2) * self.T +
+                                    self.vol2 * ( self.rho * B1 + np.sqrt(1 - self.rho ** 2) * B2))
+        if self.CallPut == 1 :
+            payoff = np.maximum((S2_T - S1_T - self.K), 0)
+        else:
+            payoff = np.maximum((self.K - S2_T - S1_T), 0)
+
+        return np.exp(-1. * self.r * self.T) * payoff
+
+    @property
+    def price(self):
+        price = np.sum(self.generate_spreads()) / float(self.simulations)
         return price
