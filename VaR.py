@@ -23,7 +23,7 @@ class VaR(object):
                 raise ValueError('Volumes(number of shares) has to be positive')
             if simulations <= 0 or simulations > 10000000:
                 raise ValueError('Simulations value not allowed')
-            methods = ['Historical', 'Var_Cov', 'Monte_Carlo']
+            methods = ['Historical', 'VarCov', 'MonteCarlo']
             if method not in methods:
                 raise ValueError('Method unknown')
         except ValueError:
@@ -56,9 +56,10 @@ class Historical(VaR):
         returns = VaR.getreturns(self)
         return returns.quantile(self.confidence_level) * self.volume
 
-class Var_Cov(VaR):
+
+class VarCov(VaR):
     def __init__(self, stock_code, confidence_level, time_horizon = 1):
-        VaR.__init__(self, stock_code, confidence_level, time_horizon, 'Var_Cov')
+        VaR.__init__(self, stock_code, confidence_level, time_horizon, 'VarCov')
 
     @property
     def value(self):
@@ -68,9 +69,9 @@ class Var_Cov(VaR):
                         returns.std()) * self.volume
 
 
-class Monte_Carlo(VaR):
+class MonteCarlo(VaR):
     def __init__(self, stock_code, confidence_level, time_horizon = 1):
-        VaR.__init__(self, stock_code, confidence_level, time_horizon, 'Monte_Carlo')
+        VaR.__init__(self, stock_code, confidence_level, time_horizon, 'MonteCarlo')
 
     def random_walk(self, mu, sig, T, initial_price):
         brownian = np.sqrt(T) * np.random.randn(self.simulations, 1)
