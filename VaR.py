@@ -1,8 +1,9 @@
 __author__ = 'JPC'
+
+import numpy as np
 from pandas.io.data import DataReader, DataFrame
 from scipy.stats import norm
 from datetime import datetime
-import numpy as np
 
 
 class VaR(object):
@@ -30,10 +31,10 @@ class VaR(object):
 			print('Error passing VaR inputs')
 
 	def getprices(self):
-		prices = DataReader(name = self.stock_code,
-		                    data_source = "yahoo",
-		                    start = datetime(2013, 1, 1),
-		                    end = datetime(2014, 12, 31))
+		prices = DataReader(name=self.stock_code,
+		                    data_source="yahoo",
+		                    start=datetime(2013, 1, 1),
+		                    end=datetime(2014, 12, 31))
 		return prices['Adj Close']
 
 	def getreturns(self):
