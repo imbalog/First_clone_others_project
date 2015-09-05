@@ -1,7 +1,7 @@
-__author__ = 'JPC'
-
 import numpy as np
 from scipy.stats import norm
+from abc import ABCMeta, abstractmethod
+
 
 class SpreadOption(object):
 
@@ -16,6 +16,7 @@ class SpreadOption(object):
     rho : float:
     CallPut : integer : 1 for a Call, and -1 for a Put
     """
+    __metaclass__ = ABCMeta
 
     def __init__(self, S1_t, S2_t, K, T, r, vol1, vol2, rho, CallPut, model):
         try:
@@ -46,8 +47,12 @@ class SpreadOption(object):
     def __str__(self):
         return "This SpreadOption is solved using {0}".format(self.model)
 
+    @abstractmethod
+    def price(self):
+        pass
 
-class margrabe(SpreadOption):
+
+class Margrabe(SpreadOption):
     def __init__ (self, S1_t, S2_t, K, T, r, vol1, vol2, rho, CallPut):
         SpreadOption.__init__(self, S1_t, S2_t, K, T, r, vol1, vol2, rho, CallPut, "Margrabe")
         if K != 0:
@@ -63,7 +68,7 @@ class margrabe(SpreadOption):
         return price
 
 
-class kirk(SpreadOption):
+class Kirk(SpreadOption):
     def __init__ (self, S1_t, S2_t, K, T, r, vol1, vol2, rho, CallPut):
         SpreadOption.__init__(self, S1_t, S2_t, K, T, r, vol1, vol2, rho, CallPut, "Kirk")
 
@@ -81,7 +86,8 @@ class kirk(SpreadOption):
                                  * norm.cdf(self.CallPut * d2, 0, 1)))
         return price
 
-class montecarlo(SpreadOption):
+
+class MonteCarlo(SpreadOption):
 
     def __init__ (self, S1_t, S2_t, K, T, r, vol1, vol2, rho, CallPut, simulations):
         SpreadOption.__init__(self, S1_t, S2_t, K, T, r, vol1, vol2, rho, CallPut, "Monte Carlo")

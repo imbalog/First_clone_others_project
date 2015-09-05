@@ -102,8 +102,8 @@ class optionMC(object):
 	simul :  int: number of simulations
 	t_steps: int: number of time steps per simulation """
 
-    def __init__(self, option_type, S0, strike, T, r, div, sigma, simul, seed = None):
-        try:
+	def __init__(self, option_type, S0, strike, T, r, div, sigma, simul, seed = None):
+		try:
             self.option_type = option_type
             assert isinstance(option_type, str)
             self.S0 = float(S0)
