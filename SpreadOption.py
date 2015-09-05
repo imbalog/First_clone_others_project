@@ -31,13 +31,16 @@ class SpreadOption(object):
             self.CallPut = int(CallPut)
             self.model = str(model)
             if T < 0 or r < 0 or S1_t < 0 or S2_t < 0:
-                raise ValueError('Negative inputs not allowed.')
+                raise ValueError('Error: Negative inputs not allowed.')
             if vol1 < 0 or vol2 < 0:
-                raise ValueError('Negative volatilities are not allowed.')
+                raise ValueError('Error: Negative volatilities are not allowed.')
             if rho > 1 or rho < -1:
-                raise ValueError('Correlation out of range')
+                raise ValueError('Error: Correlation out of range')
             if CallPut != 1 and CallPut != -1:
-                raise ValueError('For a Call: CallPut=1, or -1 for a Put')
+                raise ValueError('Error: For a Call: CallPut=1, or -1 for a Put')
+            models = ['Margrabe', 'Kirk', 'MonteCarlo']
+            if model not in models:
+                raise Exception('Error: Model Unknown')
         except ValueError:
             print('Error passing spread option inputs')
 
@@ -45,7 +48,7 @@ class SpreadOption(object):
         return self.model
 
     def __str__(self):
-        return "This SpreadOption is solved using {0}".format(self.model)
+        return "This SpreadOption is priced using {0}".format(self.model)
 
     @abstractmethod
     def price(self):
