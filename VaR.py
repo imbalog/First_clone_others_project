@@ -1,12 +1,13 @@
-__author__ = 'JPC'
-
 import numpy as np
-from pandas.io.data import DataReader, DataFrame
+from pandas.io.data import DataReader
 from scipy.stats import norm
 from datetime import datetime
+from abc import ABCMeta, abstractmethod
 
 
 class VaR(object):
+	__metaclass__ = ABCMeta
+
 	def __init__(self, stock_code, confidence_level, time_horizon, method, volume=1, simulations=100000):
 		try:
 			self.stock_code = str(stock_code)
@@ -15,7 +16,6 @@ class VaR(object):
 			self.method = str(method)
 			self.volume = int(volume)
 			self.simulations = int(simulations)
-
 			if confidence_level < 0 or confidence_level > 1:
 				raise ValueError('Confidence_level value not allowed.')
 			if time_horizon < 0 or time_horizon > 1000:
@@ -46,6 +46,10 @@ class VaR(object):
 
 	def __str__(self):
 		return 'VaR estimation using {0} method'.format(self.getmethod())
+
+	@abstractmethod
+	def value(self):
+		pass
 
 
 class Historical(VaR):
