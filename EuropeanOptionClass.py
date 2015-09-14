@@ -37,11 +37,12 @@ class EuropeanOption(object):
 		if s0 < 0 or strike < 0 or maturity <= 0 or int_rates < 0 or dividend_rates < 0 or sigma < 0:
 			raise ValueError('Error: Negative inputs not allowed')
 
+	@property
 	def getmodel(self):
 		return self.model
 
 	def __str__(self):
-		return "This EuropeanOption is priced using {0}".format(self.model)
+		return "This EuropeanOption is priced using {0}".format(self.getmodel)
 
 	@abstractmethod
 	def value(self):
