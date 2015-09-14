@@ -55,7 +55,6 @@ class JumpDiffusionOption(EuropeanOption):
             self.jump_lambda = float(jump_lambda)
             assert jump_lambda > 0
             self.jump_size = float(jump_size)
-            assert jump_size > 0
             self.jump_std = float(jump_std)
             assert jump_std > 0
             self.time_intervals = int(time_intervals)
