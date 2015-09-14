@@ -46,11 +46,12 @@ class EuropeanOption(object):
     def value(self):
         pass
 
-class JumpDiffusionOption(EuropeanOption):
+class JumpDiffusion(EuropeanOption):
 
     def __init__(self, option_type, s0, strike, maturity, int_rates, dividend_rates,
                  sigma, jump_lambda, jump_size, jump_std, time_intervals, simulations = 10000):
-        EuropeanOption.__init__(self,option_type, s0, strike, maturity, int_rates, dividend_rates, sigma, 'JumpDiffusion')
+        EuropeanOption.__init__(self,option_type, s0, strike,
+                                maturity, int_rates, dividend_rates, sigma, 'JumpDiffusion')
         try:
             self.jump_lambda = float(jump_lambda)
             assert jump_lambda > 0
@@ -79,7 +80,8 @@ class JumpDiffusionOption(EuropeanOption):
         for t in xrange(1, self.time_intervals + 1):
                 prices[t] = prices[t - 1] * (np.exp((self.int_rates - jump_drift - 0.5 * self.sigma ** 2) * dt +
                                                     self.sigma * math.sqrt(dt) * gauss_price[t]) +
-                                             (np.exp(self.jump_size + self.jump_std * gauss_jump[t]) - 1) * poisson_jump[t])
+                                             (np.exp(self.jump_size + self.jump_std * gauss_jump[t]) - 1) *
+                                             poisson_jump[t])
         return prices
 
     @property
