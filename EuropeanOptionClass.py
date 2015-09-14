@@ -15,15 +15,15 @@ class EuropeanOption(object):
 
 	__metaclass__ = ABCMeta
 
-	def __init__(self, option_type, S0, strike, T, r, div, sigma, model):
+	def __init__(self, option_type, s0, strike, maturity, int_rates, dividend_rates, sigma, model):
 		try:
 			self.option_type = option_type
 			assert isinstance(option_type, str)
-			self.S0 = float(S0)
+			self.S0 = float(s0)
 			self.strike = float(strike)
-			self.T = float(T)
-			self.r = float(r)
-			self.div = float(div)
+			self.T = float(maturity)
+			self.r = float(int_rates)
+			self.div = float(dividend_rates)
 			self.sigma = float(sigma)
 			self.model = str(model)
 		except ValueError:
@@ -35,7 +35,7 @@ class EuropeanOption(object):
 		option_types = ['call', 'put']
 		if option_type not in option_types:
 			raise ValueError("Error: Option type not valid. Enter 'call' or 'put'")
-		if S0 < 0 or strike < 0 or T <= 0 or r < 0 or div < 0 or sigma < 0:
+		if s0 < 0 or strike < 0 or maturity <= 0 or int_rates < 0 or dividend_rates < 0 or sigma < 0:
 			raise ValueError('Error: Negative inputs not allowed')
 
 	def getmodel(self):
@@ -51,8 +51,8 @@ class EuropeanOption(object):
 
 class BlackScholes(EuropeanOption):
 
-	def __init__(self, option_type, S0, strike, T, r, div, sigma):
-		EuropeanOption.__init__(self,option_type, S0, strike, T, r, div, sigma, 'BlackScholes')
+	def __init__(self, option_type, s0, strike, maturity, int_rates, dividend_rates, sigma):
+		EuropeanOption.__init__(self,option_type, s0, strike, maturity, int_rates, dividend_rates, sigma, 'BlackScholes')
 
 	@property
 	def value(self):
@@ -74,8 +74,8 @@ class BlackScholes(EuropeanOption):
 
 class MonteCarlo(EuropeanOption):
 
-	def __init__(self, option_type, S0, strike, T, r, div, sigma, simulations = 100000):
-		EuropeanOption.__init__(self, option_type, S0, strike, T, r, div, sigma, "MonteCarlo")
+	def __init__(self, option_type, s0, strike, maturity, int_rates, dividend_rates, sigma, simulations = 100000):
+		EuropeanOption.__init__(self, option_type, s0, strike, maturity, int_rates, dividend_rates, sigma, "MonteCarlo")
 		self.simulations = int(simulations)
 		try:
 			if self.simulations > 0 :
@@ -101,8 +101,8 @@ class MonteCarlo(EuropeanOption):
 
 class BinomialTree(EuropeanOption):
 
-	def __init__(self, option_type, S0, strike, T, r, div, sigma, time_grid ):
-		EuropeanOption.__init__(self, option_type, S0, strike, T, r, div, sigma, "BinomialTree")
+	def __init__(self, option_type, s0, strike, maturity, int_rates, dividend_rates, sigma, time_grid ):
+		EuropeanOption.__init__(self, option_type, s0, strike, maturity, int_rates, dividend_rates, sigma, "BinomialTree")
 		self.time_grid = int(time_grid)
 
 	@property
