@@ -10,8 +10,7 @@ class EuropeanOption(object):
 	maturity : float : time to maturity (in year fractions)
 	int_rates : float : constant risk-free short rate
 	dividend_rates :    float : dividend yield
-	sigma :  float : volatility factor in diffusion term
-	simulations: int: number of simulations for MonteCarlo"""
+	sigma :  float : volatility factor in diffusion term"""
 
 	__metaclass__ = ABCMeta
 
