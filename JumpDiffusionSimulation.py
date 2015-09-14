@@ -77,11 +77,10 @@ class JumpDiffusionOption(EuropeanOption):
         gauss_jump = np.random.standard_normal(shape)
         poisson_jump = np.random.poisson(self.jump_lambda * dt, shape)
 
-        for t in xrange(1, self.time_intervals + 1, 1):
-                prices[t] = prices[t - 1] * (np.exp((self.int_rates - jump_drift - 0.5 * self.sigma ** 2) * dt
-                                   + self.sigma * math.sqrt(dt) * gauss_price[t])
-                                   + (np.exp(self.jump_size + self.jump_std * gauss_jump[t]) - 1)
-                                   * poisson_jump[t])
+        for t in xrange(1, self.time_intervals + 1):
+                prices[t] = prices[t - 1] * (np.exp((self.int_rates - jump_drift - 0.5 * self.sigma ** 2) * dt +
+                                                    self.sigma * math.sqrt(dt) * gauss_price[t]) +
+                                             (np.exp(self.jump_size + self.jump_std * gauss_jump[t]) - 1) * poisson_jump[t])
         return prices
 
     @property
