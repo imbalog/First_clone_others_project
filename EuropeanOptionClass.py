@@ -84,7 +84,7 @@ class MonteCarlo(EuropeanOption):
 
 	def generate_payoffs(self):
 		brownian = np.random.normal(size = self.simulations)
-		price_terminal = self.S0 * np.exp(self.r - self.div - 0.5 * self.sigma ** 2 +
+		price_terminal = self.S0 * np.exp((self.r - self.div - 0.5 * self.sigma ** 2) * self.T +
 										  self.sigma * np.sqrt(self.T) * brownian)
 		if self.option_type == 'call':
 			payoff = np.maximum((price_terminal - self.strike), np.zeros(self.simulations))
