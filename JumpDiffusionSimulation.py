@@ -88,7 +88,7 @@ class JumpDiffusionOption(EuropeanOption):
         prices_simulation = self.generate_simulation()
         discount = np.exp(-self.int_rates * self.maturity)
         if self.option_type == 'call':
-            return discount * np.sum(np.maximum(prices_simulation[-1] - self.strike, 0)) / self.simulations
+            return discount * np.sum(np.maximum(prices_simulation[-1] - self.strike, 0)) / float(self.simulations)
         else:
-            return discount * np.sum(np.maximum(self.strike - prices_simulation[-1], 0)) / self.simulations
+            return discount * np.sum(np.maximum(self.strike - prices_simulation[-1], 0)) / float(self.simulations)
 
