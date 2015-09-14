@@ -5,11 +5,11 @@ from abc import ABCMeta, abstractmethod
 
 class EuropeanOption(object):
 	""" Abstract Class for European options. Partially implemented.
-	S0 : float : initial stock/index level
+	s0 : float : initial stock/index level
 	strike : float : strike price
-	T : float : time to maturity (in year fractions)
-	r : float : constant risk-free short rate
-	div :    float : dividend yield
+	maturity : float : time to maturity (in year fractions)
+	int_rates : float : constant risk-free short rate
+	dividend_rates :    float : dividend yield
 	sigma :  float : volatility factor in diffusion term
 	simulations: int: number of simulations for MonteCarlo"""
 
