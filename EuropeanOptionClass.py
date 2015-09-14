@@ -82,7 +82,8 @@ class MonteCarlo(EuropeanOption):
 		except:
 			raise ValueError("Simulation's number has to be positive integer")
 
-	def generate_payoffs(self):
+	def generate_payoffs(self, seed = 1234567890):
+		np.random.seed(seed)
 		brownian = np.random.normal(size = self.simulations)
 		price_terminal = self.S0 * np.exp((self.r - self.div - 0.5 * self.sigma ** 2) * self.T +
 										  self.sigma * np.sqrt(self.T) * brownian)
