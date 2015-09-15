@@ -68,7 +68,7 @@ class JumpDiffusion(EuropeanOption):
 
 
     def generate_simulation(self, seed = 1234567890):
-        dt = self.maturity / self.time_intervals
+        dt = self.maturity / float(self.time_intervals)
         jump_drift = self.jump_lambda * (np.exp(self.jump_size + 0.5 * self.jump_std ** 2) - 1)
         shape = (self.time_intervals + 1, self.simulations)
         prices = np.zeros((self.time_intervals + 1, self.simulations), dtype=np.float)
