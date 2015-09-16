@@ -91,7 +91,6 @@ class BlackScholes(EuropeanOption):
 
     @property
     def delta(self):
-        """  Returns BS Delta value """
         if self.option_type == 'call':
             delta = np.exp(-self.div * self.T) * self.normal_d1
         else:
@@ -100,20 +99,17 @@ class BlackScholes(EuropeanOption):
 
     @property
     def vega(self):
-        """ Returns BS Vega of option. """
         vega = self.S0 * self.normal_d1 * np.sqrt(self.T)
         return vega
 
     @property
     def gamma(self):
-        """ Returns BS Gamma of option. """
         gamma = (self.normal_d1 * np.exp(-self.div * self.T)
                  / self.S0 * self.sigma * np.sqrt(self.T))
         return gamma
 
     @property
     def rho(self):
-        """ Returns BS Rho of option"""
         if self.option_type == 'call':
             rho = self.S0 * self.T * np.exp(-self.r * self.T) * self.normal_d2
         else:
@@ -122,7 +118,6 @@ class BlackScholes(EuropeanOption):
 
     @property
     def theta(self):
-        """ Returns BS Theta of option"""
         if self.option_type == 'call':
             theta = (self.S0 * self.normal_d1 * self.sigma * np.exp(-self.r * self.T)) / 2 * np.sqrt(self.T) \
                     + self.div * self.S0 * self.normal_d1 * np.exp(-self.r * self.T) \
