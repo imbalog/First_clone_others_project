@@ -38,7 +38,7 @@ class AmericanOptionsLSMC(object):
         if S0 < 0 or strike < 0 or T <= 0 or r < 0 or div < 0 or sigma < 0:
             raise ValueError('Error: Negative inputs not allowed')
 
-        self.time_unit = self.T / self.M
+        self.time_unit = self.T / float(self.M)
         self.discount = np.exp(-self.r * self.time_unit)
 
     @property
