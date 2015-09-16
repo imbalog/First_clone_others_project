@@ -18,11 +18,17 @@ class AmericanOptionsLSMC(object):
             assert isinstance(option_type, str)
             self.S0 = float(S0)
             self.strike = float(strike)
+            assert T > 0
             self.T = float(T)
+            assert M > 0
             self.M = int(M)
+            assert r >= 0
             self.r = float(r)
+            assert div >= 0
             self.div = float(div)
+            assert sigma > 0
             self.sigma = float(sigma)
+            assert simulations > 0
             self.simulations = int(simulations)
         except ValueError:
             print('Error passing Options parameters')
@@ -40,7 +46,7 @@ class AmericanOptionsLSMC(object):
         """ Returns MC price matrix rows: time columns: price-path simulation """
         np.random.seed(seed)
         MCprice_matrix = np.zeros((self.M + 1, self.simulations),dtype=np.float64)
-        MCprice_matrix[0,:] = self.S0
+        MCprice_matrix[0, :] = self.S0
         for t in xrange(1, self.M + 1):
             ran = np.random.standard_normal( self.simulations / 2)
             ran = np.concatenate((ran, -ran))
@@ -71,10 +77,10 @@ class AmericanOptionsLSMC(object):
                                           self.MCpayoff[t, :],
                                           value_matrix[t + 1, :] * self.discount)
 
-        return value_matrix[1,:] * self.discount
+        return value_matrix[1, :] * self.discount
 
 
     @property
-    def price(self): return np.sum(self.value_vector) / self.simulations
+    def price(self): return np.sum(self.value_vector) / float(self.simulations)
 
 
