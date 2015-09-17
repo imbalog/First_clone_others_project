@@ -64,6 +64,10 @@ class EuropeanOption(object):
     def rho(self):
         pass
 
+    @abstractmethod
+    def theta(self):
+        pass
+
 
 class BlackScholes(EuropeanOption):
 
