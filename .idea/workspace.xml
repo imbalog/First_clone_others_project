@@ -33,11 +33,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EuropeanOptionClass.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="EuropeanOptionClass.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/EuropeanOptionClass.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3716551">
-              <caret line="25" column="37" selection-start-line="25" selection-start-column="37" selection-end-line="25" selection-end-column="37" />
+            <state vertical-scroll-proportion="-35.0">
+              <caret line="247" column="12" selection-start-line="247" selection-start-column="12" selection-end-line="247" selection-end-column="12" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -77,11 +77,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AsianOptionMCControlVariate.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="AsianOptionMCControlVariate.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/AsianOptionMCControlVariate.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="76" column="48" selection-start-line="76" selection-start-column="48" selection-end-line="76" selection-end-column="48" />
+            <state vertical-scroll-proportion="0.507722">
+              <caret line="63" column="37" selection-start-line="63" selection-start-column="37" selection-end-line="63" selection-end-column="37" />
               <folding />
             </state>
           </provider>
@@ -114,6 +114,7 @@
         <option value="$PROJECT_DIR$/OptionBlackScholesGreeks.py" />
         <option value="$PROJECT_DIR$/AmericanOptionsLSMC.py" />
         <option value="$PROJECT_DIR$/EuropeanOptionClass.py" />
+        <option value="$PROJECT_DIR$/AsianOptionMCControlVariate.py" />
       </list>
     </option>
   </component>
@@ -809,14 +810,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/AsianOptionMCControlVariate.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="76" column="48" selection-start-line="76" selection-start-column="48" selection-end-line="76" selection-end-column="48" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/MonteCarloParallel.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -855,11 +848,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/EuropeanOptionClass.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3716551">
-          <caret line="25" column="37" selection-start-line="25" selection-start-column="37" selection-end-line="25" selection-end-column="37" />
+        <state vertical-scroll-proportion="-35.0">
+          <caret line="247" column="12" selection-start-line="247" selection-start-column="12" selection-end-line="247" selection-end-column="12" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/AsianOptionMCControlVariate.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.507722">
+          <caret line="63" column="37" selection-start-line="63" selection-start-column="37" selection-end-line="63" selection-end-column="37" />
+          <folding />
         </state>
       </provider>
     </entry>

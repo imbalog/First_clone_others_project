@@ -50,7 +50,7 @@ class AsianOptionMC_MC(object):
         return geometric_value
 
     @property
-    def price_path(self, seed = 100):
+    def price_path(self, seed = 1234567890):
         np.random.seed(seed)
         price_path = (self.S0 *
                       np.cumprod (np.exp ((self.r - 0.5 * self.sigma ** 2) * self.time_unit + /
