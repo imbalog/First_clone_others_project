@@ -28,7 +28,7 @@ class EuropeanOption(object):
         except ValueError:
             print('Error passing Options parameters')
 
-        models = ['BlackScholes', 'MonteCarlo', 'BinomialTree']
+        models = ['BlackScholes', 'MonteCarlo', 'BinomialTree', 'FFT', 'PDE']
         if model not in models:
             raise Exception('Error: Model unknown')
         option_types = ['call', 'put']
