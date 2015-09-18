@@ -53,8 +53,8 @@ class AsianOptionMC_MC(object):
     def price_path(self, seed = 1234567890):
         np.random.seed(seed)
         price_path = (self.S0 *
-                      np.cumprod (np.exp ((self.r - 0.5 * self.sigma ** 2) * self.time_unit + /
-                                    self.sigma * np.sqrt(self.time_unit) /
+                      np.cumprod(np.exp ((self.r - 0.5 * self.sigma ** 2) * self.time_unit +
+                                    self.sigma * np.sqrt(self.time_unit)
                                           * np.random.randn(self.simulations, self.M)), 1))
         return price_path
 
