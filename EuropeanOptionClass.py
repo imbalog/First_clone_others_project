@@ -2,9 +2,11 @@ import numpy as np
 from scipy.stats import norm
 from abc import ABCMeta, abstractmethod
 
+__author__ = 'Jesus Perez Colino'
 
 class EuropeanOption(object):
-    """ Abstract Class for European options. Partially implemented.
+    """ Abstract Class for European options.
+    Not for direct use. Partially implemented.
     s0 : float : initial stock/index level
     strike : float : strike price
     maturity : float : time to maturity (in year fractions)
