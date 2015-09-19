@@ -29,9 +29,12 @@ class EuropeanOption(object):
             print('Error passing Options parameters')
 
         models = ['BlackScholes', 'MonteCarlo', 'BinomialTree', 'FFT', 'PDE']
+
         if model not in models:
             raise Exception('Error: Model unknown')
+
         option_types = ['call', 'put']
+
         if option_type not in option_types:
             raise ValueError("Error: Option type not valid. Enter 'call' or 'put'")
         if s0 < 0 or strike < 0 or maturity <= 0 or int_rates < 0 or dividend_rates < 0 or sigma < 0:
@@ -74,7 +77,9 @@ class EuropeanOption(object):
 class BlackScholes(EuropeanOption):
 
     def __init__(self, option_type, s0, strike, maturity, int_rates, dividend_rates, sigma):
-        EuropeanOption.__init__(self,option_type, s0, strike, maturity, int_rates, dividend_rates, sigma, 'BlackScholes')
+        EuropeanOption.__init__(self,option_type, s0, strike,
+                                maturity, int_rates, dividend_rates,
+                                sigma, 'BlackScholes')
 
         self.d1 = (np.log(self.S0 / self.strike) + (self.r + 0.5 * self.sigma ** 2) * self.T) / (
             self.sigma * np.sqrt(self.T))
@@ -125,13 +130,13 @@ class BlackScholes(EuropeanOption):
     @property
     def theta(self):
         if self.option_type == 'call':
-            theta = (self.S0 * self.normal_d1 * self.sigma * np.exp(-self.r * self.T)) / 2 * np.sqrt(self.T) \
-                    + self.div * self.S0 * self.normal_d1 * np.exp(-self.r * self.T) \
-                    - self.r * self.S0 * np.exp(-self.r * self.T) * self.normal_d2
+            theta = ((self.S0 * self.normal_d1 * self.sigma * np.exp(-self.r * self.T)) / 2 * np.sqrt(self.T) +
+                     self.div * self.S0 * self.normal_d1 * np.exp(-self.r * self.T) -
+                     self.r * self.S0 * np.exp(-self.r * self.T) * self.normal_d2)
         else:
-            theta = (self.S0 * self.normal_d1 * self.sigma * np.exp(-self.r * self.T)) / 2 * np.sqrt(self.T) \
-                    + self.div * self.S0 * self.normal_neg_d1 * np.exp(-self.r * self.T) \
-                    - self.r * self.S0 * np.exp(-self.r * self.T) * self.normal_neg_d2
+            theta = ((self.S0 * self.normal_d1 * self.sigma * np.exp(-self.r * self.T)) / 2 * np.sqrt(self.T) +
+                    self.div * self.S0 * self.normal_neg_d1 * np.exp(-self.r * self.T) -
+                    self.r * self.S0 * np.exp(-self.r * self.T) * self.normal_neg_d2)
         return theta
 
 
@@ -142,7 +147,7 @@ class MonteCarlo(EuropeanOption):
                                 T, r, div, sigma, "MonteCarlo")
         self.simulations = int(simulations)
         try:
-            if self.simulations > 0 :
+            if self.simulations > 0:
                 assert isinstance(self.simulations, int)
         except:
             raise ValueError("Simulation's number has to be positive integer")
@@ -172,24 +177,25 @@ class MonteCarlo(EuropeanOption):
         value_terminal = np.array(self.simulation_terminal() / float(self.S0))
         payoff = self.generate_payoffs()
         delta = np.zeros(len(payoff))
-        delta[np.nonzero(payoff)]= value_terminal[np.nonzero(payoff)]
+        delta[np.nonzero(payoff)] = value_terminal[np.nonzero(payoff)]
         return self.discount * np.sum(delta) / float(self.simulations)
 
     @property
-    def gamma(self): # TODO
+    def gamma(self):  # TODO
         pass
 
     @property
-    def vega(self): # TODO
+    def vega(self):  # TODO
         pass
 
     @property
-    def rho(self): # TODO
+    def rho(self):  # TODO
         pass
 
     @property
-    def theta(self): # TODO
+    def theta(self):  # TODO
         pass
+
 
 class BinomialTree(EuropeanOption):
 
@@ -212,20 +218,19 @@ class BinomialTree(EuropeanOption):
         index_down = np.transpose(index_up)
         index_up = move_up ** (index_up - index_down)
         index_down = move_down ** index_down
-        S = self.S0 * index_up * index_down
+        price = self.S0 * index_up * index_down
         if self.option_type == 'call':
-            V = np.maximum(S - self.strike, 0)
+            value = np.maximum(price - self.strike, 0)
         else:
-            V = np.maximum(self.strike - S, 0)
+            value = np.maximum(self.strike - price, 0)
         z=0
         for t in range(self.time_grid - 1, -1, -1):
-            V[0:self.time_grid - z, t] = (( probability *
-                                           V[0:self.time_grid - z, t + 1] +
-                                           (1 - probability) *
-                                           V[1:self.time_grid - z + 1, t + 1] ) *
-                                          discount)
+            value[0:self.time_grid - z, t] = ((probability *
+                                               value[0:self.time_grid - z, t + 1] +
+                                               (1 - probability) *
+                                               value[1:self.time_grid - z + 1, t + 1]) * discount)
             z += 1
-        return V[0,0]
+        return value[0, 0]
 
     @property
     def delta(self):  # TODO
