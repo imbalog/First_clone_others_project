@@ -88,6 +88,7 @@ class BlackScholes(EuropeanOption):
         self.d2 = (self.d1 - self.sigma * np.sqrt(self.T))
         self.normal_d1 = norm.cdf(self.d1, 0, 1)
         self.normal_neg_d1 = norm.cdf(-self.d1, 0, 1)
+        self.prob_normal_d1 = norm.pdf(self.d1, 0, 1)
         self.normal_d2 = norm.cdf(self.d2, 0, 1)
         self.normal_neg_d2 = norm.cdf(-self.d2, 0, 1)
 
@@ -112,13 +113,13 @@ class BlackScholes(EuropeanOption):
 
     @property
     def vega(self):
-        vega = self.S0 * self.normal_d1 * np.sqrt(self.T)
+        vega = self.S0 * self.prob_normal_d1 * np.sqrt(self.T)
         return vega
 
     @property
     def gamma(self):
-        gamma = (self.normal_d1 * np.exp(-self.div * self.T)
-                 / self.S0 * self.sigma * np.sqrt(self.T))
+        gamma = (self.prob_normal_d1 * np.exp(-self.div * self.T) /
+                 self.S0 * self.sigma * np.sqrt(self.T))
         return gamma
 
     @property
@@ -132,11 +133,11 @@ class BlackScholes(EuropeanOption):
     @property
     def theta(self):
         if self.option_type == 'call':
-            theta = ((self.S0 * self.normal_d1 * self.sigma * np.exp(-self.r * self.T)) / 2 * np.sqrt(self.T) +
+            theta = ((self.S0 * self.prob_normal_d1 * self.sigma * np.exp(-self.r * self.T)) / 2 * np.sqrt(self.T) +
                      self.div * self.S0 * self.normal_d1 * np.exp(-self.r * self.T) -
                      self.r * self.S0 * np.exp(-self.r * self.T) * self.normal_d2)
         else:
-            theta = ((self.S0 * self.normal_d1 * self.sigma * np.exp(-self.r * self.T)) / 2 * np.sqrt(self.T) +
+            theta = ((self.S0 * self.prob_normal_d1 * self.sigma * np.exp(-self.r * self.T)) / 2 * np.sqrt(self.T) +
                     self.div * self.S0 * self.normal_neg_d1 * np.exp(-self.r * self.T) -
                     self.r * self.S0 * np.exp(-self.r * self.T) * self.normal_neg_d2)
         return theta
