@@ -37,6 +37,7 @@ class optionBS(object):
         d2 = (d1 - self.sigma * np.sqrt(self.T))
 
         self.Nd1 = norm.cdf(d1, 0, 1)
+        self.pNd1 = norm.pdf(d1, 0, 1)
         self.Nnd1 = norm.cdf(-d1, 0, 1)
         self.Nd2 = norm.cdf(d2, 0, 1)
         self.Nnd2 = norm.cdf(-d2, 0, 1)
@@ -61,12 +62,12 @@ class optionBS(object):
 
     @property
     def vega(self):
-        vega = self.S0 * self.Nd1 * np.exp(- self.div * self.T) * np.sqrt(self.T)
+        vega = self.S0 * self.pNd1 * np.exp(- self.div * self.T) * np.sqrt(self.T)
         return vega
 
     @property
     def gamma(self):
-        gamma = (self.Nd1 * np.exp(-self.div * self.T)
+        gamma = (self.pNd1 * np.exp(-self.div * self.T)
                  / self.S0 * self.sigma * np.sqrt(self.T))
         return gamma
 
@@ -81,11 +82,11 @@ class optionBS(object):
     @property
     def theta(self):
         if self.option_type == 'call':
-            theta = ((- self.S0 * self.Nd1 * self.sigma * np.exp(-self.div * self.T)) / 2 * np.sqrt(self.T) +
+            theta = ((- self.S0 * self.pNd1 * self.sigma * np.exp(-self.div * self.T)) / 2 * np.sqrt(self.T) +
                      self.div * self.S0 * self.Nd1 * np.exp(-self.div * self.T) -
                      self.r * self.strike * np.exp(-self.r * self.T) * self.Nd2)
         else:
-            theta = ((self.S0 * self.Nd1 * self.sigma * np.exp(-self.div * self.T)) / 2 * np.sqrt(self.T) +
+            theta = ((self.S0 * self.pNd1 * self.sigma * np.exp(-self.div * self.T)) / 2 * np.sqrt(self.T) +
                      self.div * self.S0 * self.Nnd1 * np.exp(-self.div * self.T) -
                      self.r * self.strike * np.exp(-self.r * self.T) * self.Nnd2)
         return theta
