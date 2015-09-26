@@ -183,21 +183,49 @@ class MonteCarlo(EuropeanOption):
         delta[np.nonzero(payoff)] = value_terminal[np.nonzero(payoff)]
         return self.discount * np.sum(delta) / float(self.simulations)
 
-    @property
-    def gamma(self):  # TODO
-        pass
 
     @property
-    def vega(self):  # TODO
-        pass
+    def gamma(self):
+        diff = self.S0 * 0.01
+        myCall_1 = MonteCarlo(self.option_type, self.S0 + diff,
+                              self.strike, self.T, self.r, self.div, self.sigma)
+        myCall_2 = MonteCarlo(self.option_type, self.S0 - diff,
+                              self.strike, self.T, self.r, self.div, self.sigma)
+        return (myCall_1.delta - myCall_2.delta) / float(2. * diff)
 
     @property
-    def rho(self):  # TODO
-        pass
+    def vega(self):
+        diff = self.sigma * 0.01
+        myCall_1 = MonteCarlo(self.option_type, self.S0,
+                              self.strike, self.T, self.r, self.div, self.sigma + diff)
+        myCall_2 = MonteCarlo(self.option_type, self.S0,
+                              self.strike, self.T, self.r, self.div, self.sigma - diff)
+        return (myCall_1.value - myCall_2.value) / float(2. * diff)
 
     @property
-    def theta(self):  # TODO
-        pass
+    def rho(self):
+        diff = self.r * 0.01
+        if (self.r - diff) < 0:
+            myCall_1 = MonteCarlo(self.option_type, self.S0,
+                                  self.strike, self.T, self.r + diff, self.div, self.sigma)
+            myCall_2 = MonteCarlo(self.option_type, self.S0,
+                                  self.strike, self.T, self.r, self.div, self.sigma)
+            return (myCall_1.value - myCall_2.value) / float(diff)
+        else:
+            myCall_1 = MonteCarlo(self.option_type, self.S0 ,
+                                  self.strike, self.T, self.r + diff, self.div, self.sigma)
+            myCall_2 = MonteCarlo(self.option_type, self.S0,
+                                  self.strike, self.T, self.r - diff, self.div, self.sigma)
+            return (myCall_1.value - myCall_2.value) / float(2. * diff)
+
+    @property
+    def theta(self):
+        diff = 1 / 252.
+        myCall_1 = MonteCarlo(self.option_type, self.S0,
+                              self.strike, self.T + diff, self.r, self.div, self.sigma)
+        myCall_2 = MonteCarlo(self.option_type, self.S0,
+                              self.strike, self.T - diff, self.r, self.div, self.sigma)
+        return (myCall_2.value - myCall_1.value) / float(2. * diff)
 
 
 class BinomialTree(EuropeanOption):
@@ -236,21 +264,65 @@ class BinomialTree(EuropeanOption):
         return value[0, 0]
 
     @property
-    def delta(self):  # TODO
-        pass
+    def delta(self):
+        diff = self.S0 * 0.01
+        myCall_1 = BinomialTree(self.option_type, self.S0 + diff,
+                                self.strike, self.T, self.r, self.div,
+                                self.sigma, self.time_grid )
+        myCall_2 = BinomialTree(self.option_type, self.S0 - diff,
+                                self.strike, self.T, self.r, self.div,
+                                self.sigma, self.time_grid )
+        return (myCall_1.value - myCall_2.value) / float(2. * diff)
 
     @property
-    def gamma(self):  # TODO
-        pass
+    def gamma(self):
+        diff = self.S0 * 0.01
+        myCall_1 = BinomialTree(self.option_type, self.S0 + diff,
+                                self.strike, self.T, self.r, self.div,
+                                self.sigma, self.time_grid )
+        myCall_2 = BinomialTree(self.option_type, self.S0 - diff,
+                                self.strike, self.T, self.r, self.div,
+                                self.sigma, self.time_grid )
+        return (myCall_1.delta - myCall_2.delta) / float(2. * diff)
 
     @property
-    def vega(self):  # TODO
-        pass
+    def vega(self):
+        diff = self.sigma * 0.01
+        myCall_1 = BinomialTree(self.option_type, self.S0, self.strike,
+                                self.T, self.r, self.div, self.sigma + diff,
+                                self.time_grid )
+        myCall_2 = BinomialTree(self.option_type, self.S0, self.strike,
+                                self.T, self.r, self.div, self.sigma - diff,
+                                self.time_grid )
+        return (myCall_1.value - myCall_2.value) / float(2. * diff)
 
     @property
-    def rho(self):  # TODO
-        pass
+    def rho(self):
+        diff = self.r * 0.01
+        if (self.r - diff) < 0:
+            myCall_1 = BinomialTree(self.option_type, self.S0,
+                                    self.strike, self.T, self.r + diff,
+                                    self.div, self.sigma, self.time_grid )
+            myCall_2 = BinomialTree(self.option_type, self.S0,
+                                    self.strike, self.T, self.r,
+                                    self.div, self.sigma, self.time_grid )
+            return (myCall_1.value - myCall_2.value) / float(diff)
+        else:
+            myCall_1 = BinomialTree(self.option_type, self.S0 ,
+                                    self.strike, self.T, self.r + diff,
+                                    self.div, self.sigma, self.time_grid )
+            myCall_2 = BinomialTree(self.option_type, self.S0,
+                                    self.strike, self.T, self.r - diff,
+                                    self.div, self.sigma, self.time_grid )
+            return (myCall_1.value - myCall_2.value) / float(2. * diff)
 
     @property
-    def theta(self):   # TODO
-        pass
+    def theta(self):
+        diff = 1 / 252.
+        myCall_1 = BinomialTree(self.option_type, self.S0, self.strike,
+                                self.T + diff, self.r, self.div, self.sigma ,
+                                self.time_grid )
+        myCall_2 = BinomialTree(self.option_type, self.S0, self.strike,
+                                self.T - diff , self.r, self.div, self.sigma,
+                                self.time_grid )
+        return (myCall_2.value - myCall_1.value) / float(2. * diff)
