@@ -183,7 +183,6 @@ class MonteCarlo(EuropeanOption):
         delta[np.nonzero(payoff)] = value_terminal[np.nonzero(payoff)]
         return self.discount * np.sum(delta) / float(self.simulations)
 
-
     @property
     def gamma(self):
         diff = self.S0 * 0.01
