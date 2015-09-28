@@ -29,7 +29,8 @@ class EuropeanOption(object):
         except ValueError:
             print('Error passing Options parameters')
 
-        models = ['BlackScholes', 'MonteCarlo', 'BinomialTree', 'JumpDiffusion']
+        models = ['BlackScholes', 'MonteCarlo', 'BinomialTree', 'JumpDiffusion', 'FFT', 'PDE']
+
         if model not in models:
             raise Exception('Error: Model unknown')
         option_types = ['call', 'put']
@@ -49,6 +50,7 @@ class EuropeanOption(object):
     def value(self):
         pass
 
+
 class JumpDiffusion(EuropeanOption):
 
     def __init__(self, option_type, s0, strike, maturity, int_rates, dividend_rates,
@@ -67,7 +69,6 @@ class JumpDiffusion(EuropeanOption):
             assert simulations > 0
         except ValueError:
             print('Error passing the Jump parameters')
-
 
     def generate_simulation(self, seed = 1234567890):
         dt = self.maturity / float(self.time_intervals)
@@ -95,6 +96,7 @@ class JumpDiffusion(EuropeanOption):
             return discount * np.sum(np.maximum(prices_simulation[-1] - self.strike, 0)) / float(self.simulations)
         else:
             return discount * np.sum(np.maximum(self.strike - prices_simulation[-1], 0)) / float(self.simulations)
+
 
 class JumpDiffusionFFT(EuropeanOption):
 
