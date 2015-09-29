@@ -83,4 +83,75 @@ class AmericanOptionsLSMC(object):
     @property
     def price(self): return np.sum(self.value_vector) / float(self.simulations)
 
+    @property
+    def delta(self):
+        diff = self.S0 * 0.01
+        myCall_1 = AmericanOptionsLSMC(self.option_type, self.S0 + diff,
+                                       self.strike, self.T, self.M,
+                                       self.r, self.div, self.sigma, self.simulations)
+        myCall_2 = AmericanOptionsLSMC(self.option_type, self.S0 - diff,
+                                       self.strike, self.T, self.M,
+                                       self.r, self.div, self.sigma, self.simulations)
+        return (myCall_1.price - myCall_2.price) / float(2. * diff)
 
+    @property
+    def gamma(self):
+        diff = self.S0 * 0.01
+        myCall_1 = AmericanOptionsLSMC(self.option_type, self.S0 + diff,
+                                       self.strike, self.T, self.M,
+                                       self.r, self.div, self.sigma, self.simulations)
+        myCall_2 = AmericanOptionsLSMC(self.option_type, self.S0 - diff,
+                                       self.strike, self.T, self.M,
+                                       self.r, self.div, self.sigma, self.simulations)
+        return (myCall_1.delta - myCall_2.delta) / float(2. * diff)
+
+    @property
+    def vega(self):
+        diff = self.sigma * 0.01
+        myCall_1 = AmericanOptionsLSMC(self.option_type, self.S0,
+                                       self.strike, self.T, self.M,
+                                       self.r, self.div, self.sigma + diff,
+                                       self.simulations)
+        myCall_2 = AmericanOptionsLSMC(self.option_type, self.S0,
+                                       self.strike, self.T, self.M,
+                                       self.r, self.div, self.sigma - diff,
+                                       self.simulations)
+        return (myCall_1.price - myCall_2.price) / float(2. * diff)
+
+    @property
+    def rho(self):
+        diff = self.r * 0.01
+        if (self.r - diff) < 0:
+            myCall_1 = AmericanOptionsLSMC(self.option_type, self.S0,
+                                       self.strike, self.T, self.M,
+                                       self.r + diff, self.div, self.sigma,
+                                       self.simulations)
+            myCall_2 = AmericanOptionsLSMC(self.option_type, self.S0,
+                                       self.strike, self.T, self.M,
+                                       self.r, self.div, self.sigma,
+                                       self.simulations)
+            return (myCall_1.price - myCall_2.price) / float(diff)
+        else:
+            myCall_1 = AmericanOptionsLSMC(self.option_type, self.S0,
+                                       self.strike, self.T, self.M,
+                                       self.r + diff, self.div, self.sigma,
+                                       self.simulations)
+            myCall_2 = AmericanOptionsLSMC(self.option_type, self.S0,
+                                       self.strike, self.T, self.M,
+                                       self.r - diff, self.div, self.sigma,
+                                       self.simulations)
+            return (myCall_1.price - myCall_2.price) / float(2. * diff)
+
+    @property
+    def theta(self):
+        diff = 1 / 252.
+        myCall_1 = AmericanOptionsLSMC(self.option_type, self.S0,
+                                       self.strike, self.T + diff, self.M,
+                                       self.r, self.div, self.sigma,
+                                       self.simulations)
+        myCall_2 = AmericanOptionsLSMC(self.option_type, self.S0,
+                                       self.strike, self.T - diff, self.M,
+                                       self.r, self.div, self.sigma,
+                                       self.simulations)
+        return (myCall_2.price - myCall_1.price) / float(2. * diff)
+    
