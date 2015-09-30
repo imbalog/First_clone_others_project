@@ -4,6 +4,7 @@ from abc import ABCMeta, abstractmethod
 
 __author__ = 'Jesus Perez Colino'
 
+
 class EuropeanOption(object):
     """ Abstract Class for European options.
     Not for direct use. Partially implemented.
