@@ -74,6 +74,7 @@ class JumpDiffusion(EuropeanOption):
         try:
             if seed is not None:
                 assert isinstance(seed, int)
+                np.random.seed(seed)
         except:
             raise ValueError('Error passing the seed')
         dt = self.maturity / float(self.time_intervals)
@@ -81,7 +82,6 @@ class JumpDiffusion(EuropeanOption):
         shape = (self.time_intervals + 1, self.simulations)
         prices = np.zeros((self.time_intervals + 1, self.simulations), dtype=np.float)
         prices[0] = self.s0
-        np.random.seed(seed)
         gauss_price = np.random.standard_normal(shape)
         gauss_jump = np.random.standard_normal(shape)
         poisson_jump = np.random.poisson(self.jump_lambda * dt, shape)
