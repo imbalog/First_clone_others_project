@@ -109,7 +109,7 @@ class JumpDiffusionFFT(EuropeanOption):
                  int_rates, dividend_rates, sigma,
                  jump_lambda, jump_size, jump_std,
                  time_intervals, simulations = 10000):
-        EuropeanOption.__init__(self,option_type, s0, strike,
+        EuropeanOption.__init__(self, option_type, s0, strike,
                                 maturity, int_rates, dividend_rates,
                                 sigma, 'JumpDiffusion')
         try:
@@ -130,8 +130,8 @@ class JumpDiffusionFFT(EuropeanOption):
                      self.jump_lambda * (np.exp(self.jump_size + 0.5 * delta ** 2) - 1))
             value = np.exp((1j * ux * omega - 0.5 * ux ** 2 * self.sigma ** 2 +
                             self.jump_lambda * (np.exp(1j * ux * self.jump_size -
-                                                       ux ** 2 * delta ** 2 * 0.5) - 1))
-                           * self.maturity)
+                                                       ux ** 2 * delta ** 2 * 0.5) - 1)) *
+                           self.maturity)
             return value
 
     @property
