@@ -95,7 +95,6 @@ class BlackScholes(EuropeanOption):
 
     @property
     def value(self):
-
         if self.option_type == 'call':
             value = (self.S0 * np.exp(-self.div * self.T) * self.normal_d1 -
                      self.strike * np.exp(-self.r * self.T) * self.normal_d2)
