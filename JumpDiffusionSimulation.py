@@ -71,6 +71,11 @@ class JumpDiffusion(EuropeanOption):
             print('Error passing the Jump parameters')
 
     def generate_simulation(self, seed = 1234567890):
+        try:
+            if seed is not None:
+                assert isinstance(seed, int)
+        except:
+            raise ValueError('Error passing the seed')
         dt = self.maturity / float(self.time_intervals)
         jump_drift = self.jump_lambda * (np.exp(self.jump_size + 0.5 * self.jump_std ** 2) - 1)
         shape = (self.time_intervals + 1, self.simulations)

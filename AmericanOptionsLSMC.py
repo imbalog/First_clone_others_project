@@ -49,7 +49,7 @@ class AmericanOptionsLSMC(object):
 			if seed is not None:
 				assert isinstance(seed, int)
 		except:
-			raise ValueError('Error passing seed')
+			raise ValueError('Error passing the seed')
 		np.random.seed(seed)
 		MCprice_matrix = np.zeros((self.M + 1, self.simulations), dtype=np.float64)
 		MCprice_matrix[0, :] = self.S0
