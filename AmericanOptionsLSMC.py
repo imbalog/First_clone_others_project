@@ -42,8 +42,13 @@ class AmericanOptionsLSMC(object):
         self.discount = np.exp(-self.r * self.time_unit)
 
     @property
-    def MCprice_matrix(self, seed = 123):
+    def MCprice_matrix(self, seed = 1234567890):
         """ Returns MC price matrix rows: time columns: price-path simulation """
+        try:
+            if seed is not None:
+                assert isinstance(seed, int)
+        except:
+            print 'Error passing seed'
         np.random.seed(seed)
         MCprice_matrix = np.zeros((self.M + 1, self.simulations),dtype=np.float64)
         MCprice_matrix[0, :] = self.S0
@@ -154,4 +159,4 @@ class AmericanOptionsLSMC(object):
                                        self.r, self.div, self.sigma,
                                        self.simulations)
         return (myCall_2.price - myCall_1.price) / float(2. * diff)
-    
+
