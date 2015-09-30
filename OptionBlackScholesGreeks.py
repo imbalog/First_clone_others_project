@@ -4,6 +4,8 @@
 import numpy as np
 from scipy.stats import norm
 
+__author__ = 'Jesus Perez Colino'
+
 
 class optionBS(object):
     """ Class for European options in BS model.

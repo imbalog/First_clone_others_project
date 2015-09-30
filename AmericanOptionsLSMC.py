@@ -1,5 +1,7 @@
 import numpy as np
 
+__author__ = 'Jesus Perez Colino'
+
 
 class AmericanOptionsLSMC(object):
 	""" Class for American options pricing using Longstaff-Schwartz (2001):

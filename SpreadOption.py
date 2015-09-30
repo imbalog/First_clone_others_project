@@ -2,6 +2,8 @@ import numpy as np
 from scipy.stats import norm
 from abc import ABCMeta, abstractmethod
 
+__author__ = 'Jesus Perez Colino'
+
 
 class SpreadOption(object):
 
