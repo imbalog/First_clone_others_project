@@ -35,12 +35,10 @@ class AmericanOptionsLSMC(object):
 			self.simulations = int(simulations)
 		except ValueError:
 			print('Error passing Options parameters')
-
 		if option_type != 'call' and option_type != 'put':
 			raise ValueError("Error: option type not valid. Enter 'call' or 'put'")
 		if S0 < 0 or strike < 0 or T <= 0 or r < 0 or div < 0 or sigma < 0:
 			raise ValueError('Error: Negative inputs not allowed')
-
 		self.time_unit = self.T / float(self.M)
 		self.discount = np.exp(-self.r * self.time_unit)
 
@@ -84,7 +82,6 @@ class AmericanOptionsLSMC(object):
 			value_matrix[t, :] = np.where(self.MCpayoff[t, :] > continuation_value,
 			                              self.MCpayoff[t, :],
 			                              value_matrix[t + 1, :] * self.discount)
-
 		return value_matrix[1, :] * self.discount
 
 	@property

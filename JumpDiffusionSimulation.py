@@ -126,10 +126,12 @@ class JumpDiffusionFFT(EuropeanOption):
             print('Error passing the Jump parameters')
 
     def characteristic_function(self, ux, x0, delta):
-            omega = x0 / self.maturity + self.int_rates - 0.5 * self.sigma ** 2 \
-                - self.jump_lambda * (np.exp(self.jump_size + 0.5 * delta ** 2) - 1)
+            omega = (x0 / self.maturity + self.int_rates - 0.5 * self.sigma ** 2 -
+                     self.jump_lambda * (np.exp(self.jump_size + 0.5 * delta ** 2) - 1))
             value = np.exp((1j * ux * omega - 0.5 * ux ** 2 * self.sigma ** 2 +
-                self.jump_lambda * (np.exp(1j * ux * self.jump_size - ux ** 2 * delta ** 2 * 0.5) - 1)) * self.maturity)
+                            self.jump_lambda * (np.exp(1j * ux * self.jump_size -
+                                                       ux ** 2 * delta ** 2 * 0.5) - 1))
+                           * self.maturity)
             return value
 
     @property
