@@ -182,15 +182,15 @@ class MonteCarlo(EuropeanOption):
     def generate_payoffs(self):
         price_terminal = self.simulation_terminal()
         if self.option_type == 'call':
-            payoff = np.maximum((price_terminal - self.strike), np.zeros(self.simulations))
+            payoff = np.maximum((price_terminal - self.strike), 0)
         else:
-            payoff = np.maximum((self.strike - price_terminal), np.zeros(self.simulations))
+            payoff = np.maximum((self.strike - price_terminal), 0)
         return payoff
 
     @property
     def value(self):
         payoff = self.generate_payoffs()
-        return self.discount * np.sum(payoff) / float(self.simulations)
+        return self.discount * np.sum(payoff) / float(len(payoff))
 
     @property
     def delta(self):
