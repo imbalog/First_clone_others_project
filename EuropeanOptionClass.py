@@ -161,12 +161,13 @@ class MonteCarlo(EuropeanOption):
             raise ValueError("Simulation's number has to be positive integer")
 
     def simulation_terminal(self, seed=123456):
-        try:
-            if seed is not None:
-                assert isinstance(seed, int)
-                np.random.seed(seed)
-        except:
-            raise ValueError('Error passing seed')
+        if self.fixed_seed:
+            try:
+                if seed is not None:
+                    assert isinstance(seed, int)
+                    np.random.seed(seed)
+            except:
+                raise ValueError('Error passing seed')
         if self.antithetic:
             brownian = np.random.standard_normal(size = self.simulations)
             brownian = np.concatenate((brownian, -brownian))
