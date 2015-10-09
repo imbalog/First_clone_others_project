@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.special import erf
 
+__author__ = 'Jesus Perez Colino'
+
 
 class AsianOptionMC_MC(object):
     """ Class for Asian options pricing using control variate
@@ -54,8 +56,8 @@ class AsianOptionMC_MC(object):
         np.random.seed(seed)
         price_path = (self.S0 *
                       np.cumprod(np.exp ((self.r - 0.5 * self.sigma ** 2) * self.time_unit +
-                                    self.sigma * np.sqrt(self.time_unit)
-                                          * np.random.randn(self.simulations, self.M)), 1))
+                                         self.sigma * np.sqrt(self.time_unit) *
+                                         np.random.randn(self.simulations, self.M)), 1))
         return price_path
 
     @property

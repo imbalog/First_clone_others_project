@@ -4,6 +4,8 @@ from scipy.stats import norm
 from datetime import datetime
 from abc import ABCMeta, abstractmethod
 
+__author__ = 'Jesus Perez Colino'
+
 
 class VaR(object):
 	__metaclass__ = ABCMeta

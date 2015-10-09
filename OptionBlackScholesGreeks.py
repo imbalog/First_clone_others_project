@@ -1,6 +1,3 @@
-# Valuation of European call/put options in Black-Scholes (BS) Model
-
-
 import numpy as np
 from scipy.stats import norm
 
