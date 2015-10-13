@@ -20,7 +20,7 @@ class EuropeanCallOption:
             assert type(seed) is int
             np.random.seed(seed)
         if antithetic:
-            brownian = np.random.standard_normal(int(np.ceil(simulations/2.)))
+            brownian = np.random.standard_normal(int(np.ceil(simulations / 2.)))
             brownian = np.concatenate((brownian, -brownian))
         else:
             brownian = np.random.standard_normal(simulations)
@@ -28,7 +28,7 @@ class EuropeanCallOption:
         price_terminal = self.S * np.exp((self.r - 0.5 * self.sigma ** 2) * self.T +
                                           self.sigma * np.sqrt(self.T) * brownian)
         payoff = np.maximum((price_terminal - self.K), 0)
-        return np.exp(-1.0 * self.r * self.T) * np.sum(payoff)/ float(simulations)
+        return np.exp(-1.0 * self.r * self.T) * np.sum(payoff) / float(simulations)
 
 
 def eval_price_in_pool(simulations):
@@ -38,26 +38,26 @@ def eval_price_in_pool(simulations):
 
 
 if __name__ == '__main__':
-	import multiprocessing
-	from numpy import ceil, mean
-	import time
-	import os
-	c = EuropeanCallOption(0.2, 100, 100, 1, 0.05)
-	print 'BS Price:', c.priceBS()
-	print '-' * 75
-	scenarios = {'1': [1e4, 5e7], '2': [1e4, 5e7], '4': [1e4, 5e7], '8': [1e4, 5e7]}
-	for num_processes in scenarios:
-		for N in scenarios[num_processes]:
-			start = time.time()
-			chunks = [int(ceil(N / int(num_processes)))] * int(num_processes)
-			chunks[-1] = int(chunks[-1] - sum(chunks) + N)
-			p = multiprocessing.Pool(int(num_processes))
-			option_price = p.map(eval_price_in_pool, chunks)
-			p.close()
-			p.join()
-			end = time.time()
-			print 'Number of processors:', num_processes + ',',
-			print 'Number of simulations:', str(int(N))
-			print 'Monte Carlo Option Price:', str(mean(option_price)) + ',',
-			print 'Time, in sec:', str(end - start)
-			print '-' * 75
+    import multiprocessing
+    from numpy import ceil, mean
+    import time
+    import os
+    c = EuropeanCallOption(0.2, 100, 100, 1, 0.05)
+    print 'BS Price:', c.priceBS()
+    print '-' * 75
+    scenarios = {'1': [1e4, 5e7], '2': [1e4, 5e7], '4': [1e4, 5e7], '8': [1e4, 5e7]}
+    for num_processes in scenarios:
+        for N in scenarios[num_processes]:
+            start = time.time()
+            chunks = [int(ceil(N / int(num_processes)))] * int(num_processes)
+            chunks[-1] = int(chunks[-1] - sum(chunks) + N)
+            p = multiprocessing.Pool(int(num_processes))
+            option_price = p.map(eval_price_in_pool, chunks)
+            p.close()
+            p.join()
+            end = time.time()
+            print 'Number of processors:', num_processes + ',',
+            print 'Number of simulations:', str(int(N))
+            print 'Monte Carlo Option Price:', str(mean(option_price)) + ',',
+            print 'Time, in sec:', str(end - start)
+            print '-' * 75
