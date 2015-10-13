@@ -34,28 +34,22 @@ class EuropeanCallOption:
 
 def eval_price_in_pool(simulations):
 	import os
-	c = EuropeanCallOption(0.2, 100, 100, 1, 0.05)
-	return c.priceMC(simulations, seed=os.getpid())
+	call = EuropeanCallOption(0.2, 100, 100, 1, 0.05)
+	return call.priceMC(simulations, seed=os.getpid())
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
 	import multiprocessing
 	from numpy import ceil, mean
 	import time
 	c = EuropeanCallOption(0.2, 100, 100, 1, 0.05)
 	print 'BS Price:', c.priceBS()
 	print '-' * 75
-	scenarios = {}
-	scenarios['1'] = [1e3, 1e6]
-	scenarios['2'] = [1e3, 1e6]
-	scenarios['4'] = [1e3, 1e6]
-	scenarios['8'] = [1e3, 1e6]
-	# scenarios['16'] = [1e6, 1e7, 1e8]
-	# scenarios['32'] = [1e6, 1e7, 1e8, 1e9]
+	scenarios = {'1': [1e3, 1e6], '2': [1e3, 1e6], '4': [1e3, 1e6], '8': [1e3, 1e6]}
 	for num_processes in scenarios:
 		for N in scenarios[num_processes]:
 			start = time.time()
-			chunks = [int(ceil(N/int(num_processes)))] * int(num_processes)
+			chunks = [int(ceil(N / int(num_processes)))] * int(num_processes)
 			chunks[-1] = int(chunks[-1] - sum(chunks) + N)
 			p = multiprocessing.Pool(int(num_processes))
 			option_price = p.map(eval_price_in_pool, chunks)
@@ -67,6 +61,3 @@ if __name__=='__main__':
 			print 'Monte Carlo Option Price:', str(mean(option_price)) + ',',
 			print 'Time, in sec:', str(end - start)
 			print '-' * 75
-
-
-
