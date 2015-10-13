@@ -14,7 +14,7 @@ class EuropeanCallOption:
 		d2 = d1 - self.sigma * np.sqrt(self.T)
 		return norm.cdf(d1) * self.S - norm.cdf(d2) * self.K * np.exp(-1.0 * self.r * self.T)
 
-	def priceMC(self, simulations=1, seed=None):
+	def priceMC(self, simulations=1, seed=1234567890, antithetic=True):
 		import numpy as np
 		from numpy.random import RandomState
 		if seed is not None:
@@ -26,14 +26,13 @@ class EuropeanCallOption:
 		for i in range(simulations):
 			brownian = rnd.normal()
 			sum_payoff += np.maximum(self.S *
-			                         np.exp(self.r - 0.5 * self.sigma**2 +
+			                         np.exp((self.r - 0.5 * self.sigma**2) * self.T +
 			                                self.sigma * np.sqrt(self.T) * brownian) -
 			                         self.K, 0)
 		return np.exp(-1.0 * self.r * self.T) * sum_payoff / float(simulations)
 
 
 def eval_price_in_pool(simulations):
-	import os
 	call = EuropeanCallOption(0.2, 100, 100, 1, 0.05)
 	return call.priceMC(simulations, seed=os.getpid())
 
@@ -42,10 +41,11 @@ if __name__ == '__main__':
 	import multiprocessing
 	from numpy import ceil, mean
 	import time
+	import os
 	c = EuropeanCallOption(0.2, 100, 100, 1, 0.05)
 	print 'BS Price:', c.priceBS()
 	print '-' * 75
-	scenarios = {'1': [1e3, 1e6], '2': [1e3, 1e6], '4': [1e3, 1e6], '8': [1e3, 1e6]}
+	scenarios = {'1': [1e3, 5e6], '2': [1e3, 5e6], '4': [1e3, 5e6], '8': [1e3, 5e6]}
 	for num_processes in scenarios:
 		for N in scenarios[num_processes]:
 			start = time.time()
