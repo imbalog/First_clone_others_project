@@ -45,7 +45,7 @@ if __name__ == '__main__':
 	c = EuropeanCallOption(0.2, 100, 100, 1, 0.05)
 	print 'BS Price:', c.priceBS()
 	print '-' * 75
-	scenarios = {'1': [1e3, 5e6], '2': [1e3, 5e6], '4': [1e3, 5e6], '8': [1e3, 5e6]}
+	scenarios = {'1': [1e4, 5e7], '2': [1e4, 5e7], '4': [1e4, 5e7], '8': [1e4, 5e7]}
 	for num_processes in scenarios:
 		for N in scenarios[num_processes]:
 			start = time.time()
