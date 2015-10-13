@@ -23,7 +23,7 @@ class EuropeanCallOption:
             brownian = np.random.standard_normal(int(np.ceil(simulations/2.)))
             brownian = np.concatenate((brownian, -brownian))
         else:
-            brownian = rnd.normal(simulations)
+            brownian = np.random.standard_normal(simulations)
 
         price_terminal = self.S * np.exp((self.r - 0.5 * self.sigma ** 2) * self.T +
                                           self.sigma * np.sqrt(self.T) * brownian)
