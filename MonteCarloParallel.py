@@ -1,51 +1,149 @@
-class EuropeanCallOption:
-    def __init__(self, sigma, S, K, T, r):
-        self.sigma = float(sigma)
-        self.S = float(S)
-        self.K = float(K)
-        self.T = float(T)
-        self.r = float(r)
+import numpy as np
+from scipy.stats import norm
+from abc import ABCMeta, abstractmethod
+import multiprocessing
+from numpy import ceil, mean
+import time
 
-    def priceBS(self):
-        import numpy as np
-        from scipy.stats import norm
-        d1 = 1.0 / float(self.sigma * np.sqrt(self.T))
-        d1 *= np.log(self.K / self.S) + (self.r + 0.5 * self.sigma ** 2) * self.T
-        d2 = d1 - self.sigma * np.sqrt(self.T)
-        return norm.cdf(d1) * self.S - norm.cdf(d2) * self.K * np.exp(-1.0 * self.r * self.T)
 
-    def priceMC(self, simulations=1, seed=1234567890, antithetic=True):
-        import numpy as np
-        if seed is not None:
-            assert type(seed) is int
+class EuropeanOption(object):
+    """ Abstract Class for European options. Partially implemented.
+    S0 : float : initial stock/index level
+    strike : float : strike price
+    T : float : time to maturity (in year fractions)
+    r : float : constant risk-free short rate
+    div :    float : dividend yield
+    sigma :  float : volatility factor in diffusion term
+    model: str: name of the model for the pricing"""
+
+    __metaclass__ = ABCMeta
+
+    def __init__(self, option_type, S0, strike, T, r, div, sigma, model):
+        try:
+            self.option_type = option_type
+            assert isinstance(option_type, str)
+            self.S0 = float(S0)
+            self.strike = float(strike)
+            self.T = float(T)
+            self.r = float(r)
+            self.div = float(div)
+            self.sigma = float(sigma)
+            self.model = str(model)
+        except ValueError:
+            print('Error passing Options parameters')
+
+        models = ['BlackScholes', 'MonteCarlo',
+                  'BinomialTree', 'TrinomialTree',
+                  'FFT', 'PDE']
+
+        if model not in models:
+            raise Exception('Error: Model unknown')
+
+        option_types = ['call', 'put']
+
+        if option_type not in option_types:
+            raise ValueError("Error: Option type not valid. Enter 'call' or 'put'")
+        if S0 < 0 or strike < 0 or T <= 0 or r < 0 or div < 0 or sigma < 0:
+            raise ValueError('Error: Negative inputs not allowed')
+
+        self.discount = np.exp(-self.r * self.T)
+
+    def getmodel(self):
+        return self.model
+
+    def __str__(self):
+        return "This European Option is priced using {0}".format(self.getmodel())
+
+    @abstractmethod
+    def value(self):
+        pass
+
+class BlackScholes(EuropeanOption):
+
+    def __init__(self, option_type, S0, strike, T, r, div, sigma):
+        EuropeanOption.__init__(self,option_type, S0, strike,
+                                T, r, div, sigma, 'BlackScholes')
+
+        d1 = ((np.log(self.S0 / self.strike) +
+              (self.r - self.div + 0.5 * (self.sigma ** 2)) * self.T) /
+              float( self.sigma * np.sqrt(self.T)))
+        d2 = float(d1 - self.sigma * np.sqrt(self.T))
+        self.Nd1 = norm.cdf(d1, 0, 1)
+        self.Nnd1 = norm.cdf(-d1, 0, 1)
+        self.Nd2 = norm.cdf(d2, 0, 1)
+        self.Nnd2 = norm.cdf(-d2, 0, 1)
+        self.pNd1 = norm.pdf(d1, 0, 1)
+
+    @property
+    def value(self):
+        if self.option_type == 'call':
+            value = (self.S0 * np.exp(-self.div * self.T) * self.Nd1 -
+                     self.strike * np.exp(-self.r * self.T) * self.Nd2)
+        else:
+            value = (self.strike * np.exp(-self.r * self.T) * self.Nnd2 -
+                     self.S0 * np.exp(-self.div * self.T) * self.Nnd1)
+        return value
+
+class MonteCarlo(EuropeanOption):
+
+    def __init__(self, option_type, S0, strike, T, r, div, sigma,
+                 simulations = 500000,
+                 antithetic = True,
+                 moment_matching = True,
+                 fixed_seed = True):
+        EuropeanOption.__init__(self, option_type, S0, strike, T, r, div, sigma, "MonteCarlo")
+        self.simulations = int(simulations)
+        self.antithetic = bool(antithetic)
+        self.moment_matching = bool(moment_matching)
+        self.fixed_seed = bool(fixed_seed)
+        try:
+            if self.simulations > 0 :
+                assert isinstance(self.simulations, int)
+        except:
+            raise ValueError("Simulation's number has to be positive integer")
+
+    def simulation_terminal(self, seed = 1234567890):
+        if self.fixed_seed:
+            assert isinstance(seed, int)
             np.random.seed(seed)
-        if antithetic:
-            brownian = np.random.standard_normal(int(np.ceil(simulations / 2.)))
+        if self.antithetic:
+            brownian = np.random.standard_normal(size = int(np.ceil(self.simulations/2.)))
             brownian = np.concatenate((brownian, -brownian))
         else:
-            brownian = np.random.standard_normal(simulations)
+            brownian = np.random.standard_normal(size = self.simulations)
+        if self.moment_matching:
+            brownian = brownian - np.mean(brownian)
+            brownian = brownian / np.std(brownian)
 
-        price_terminal = self.S * np.exp((self.r - 0.5 * self.sigma ** 2) * self.T +
+        price_terminal = self.S0 * np.exp((self.r - self.div - 0.5 * self.sigma ** 2) *
+                                          self.T +
                                           self.sigma * np.sqrt(self.T) * brownian)
-        payoff = np.maximum((price_terminal - self.K), 0)
-        return np.exp(-1.0 * self.r * self.T) * np.sum(payoff) / float(simulations)
+        return price_terminal
+
+    def generate_payoffs(self):
+        price_terminal = self.simulation_terminal()
+        if self.option_type == 'call':
+            payoff = np.maximum((price_terminal - self.strike), 0)
+        else:
+            payoff = np.maximum((self.strike - price_terminal), 0)
+        return payoff
+
+    @property
+    def value(self):
+        payoff = self.generate_payoffs()
+        return self.discount * np.sum(payoff) / float(len(payoff))
 
 
 def eval_price_in_pool(simulations):
-    import os
-    call = EuropeanCallOption(0.2, 100., 100., 1, 0.05)
-    return call.priceMC(simulations, seed=os.getpid())
+    myCall = MonteCarlo('call', 100., 100., .5, 0.01, 0., .35, simulations)
+    return myCall.value
 
 
 if __name__ == '__main__':
-    import multiprocessing
-    from numpy import ceil, mean
-    import time
-    import os
-    c = EuropeanCallOption(0.2, 100, 100, 1, 0.05)
-    print 'BS Price:', c.priceBS()
+    c = BlackScholes('call', 100., 100., .5, 0.01, 0., .35)
+    print 'BS Price:', c.value
     print '-' * 75
-    scenarios = {'1': [1e4, 5e7], '2': [1e4, 5e7], '4': [1e4, 5e7], '8': [1e4, 5e7]}
+    scenarios = {'1': [1e3, 5e6], '2': [1e3, 5e6], '4': [1e3, 5e6], '8': [1e3, 5e6]}
     for num_processes in scenarios:
         for N in scenarios[num_processes]:
             start = time.time()
