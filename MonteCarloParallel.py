@@ -66,7 +66,7 @@ class BlackScholes(EuropeanOption):
 
         d1 = ((np.log(self.S0 / self.strike) +
               (self.r - self.div + 0.5 * (self.sigma ** 2)) * self.T) /
-              float( self.sigma * np.sqrt(self.T)))
+              float(self.sigma * np.sqrt(self.T)))
         d2 = float(d1 - self.sigma * np.sqrt(self.T))
         self.Nd1 = norm.cdf(d1, 0, 1)
         self.Nnd1 = norm.cdf(-d1, 0, 1)
