@@ -35,7 +35,7 @@ class SpreadOption(object):
             if T < 0 or r < 0 or S1_t < 0 or S2_t < 0:
                 raise ValueError('Error: Negative inputs not allowed.')
             if vol1 < 0 or vol2 < 0:
-                raise ValueError('Error: Negative volatilities are not allowed.')
+                raise ValueError("Error: Negative volatilities are not allowed.")
             if rho > 1 or rho < -1:
                 raise ValueError('Error: Correlation out of range')
             if CallPut != 1 and CallPut != -1:
@@ -114,7 +114,7 @@ class MonteCarlo(SpreadOption):
         B2 = np.sqrt(self.T) * np.random.randn(self.simulations, 1)
         S1_T = self.S1_t * np.exp((self.r - 0.5 * self.vol1 ** 2) * self.T + self.vol1 * B1)
         S2_T = self.S2_t * np.exp((self.r - 0.5 * self.vol2 ** 2) * self.T +
-                                    self.vol2 * (self.rho * B1 + np.sqrt(1 - self.rho ** 2) * B2))
+                                  self.vol2 * (self.rho * B1 + np.sqrt(1 - self.rho ** 2) * B2))
         if self.CallPut == 1:
             payoff = np.maximum((S2_T - S1_T - self.K), 0)
         else:
