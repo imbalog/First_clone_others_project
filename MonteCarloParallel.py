@@ -134,23 +134,41 @@ class MonteCarlo(EuropeanOption):
         return self.discount * np.sum(payoff) / float(len(payoff))
 
 
-def eval_price_in_pool(simulations):
+def eval_in_pool(simulations, method = 'value'):
+    try:
+        assert isinstance(simulations, int)
+        if method is not None:
+            assert isinstance(method, str)
+    except ValueError:
+        print 'Type in the parameters incorrect'
     myCall = MonteCarlo('call', 100., 100., .5, 0.01, 0., .35, simulations)
-    return myCall.value
+    def eval_value():
+        return myCall.value
+    def eval_delta():
+        return myCall.delta
+    if method == 'value':
+        return eval_value()
+    if method == 'delta':
+        return eval_delta()
 
 
 if __name__ == '__main__':
     c = BlackScholes('call', 100., 100., .5, 0.01, 0., .35)
     print 'BS Price:', c.value
     print '-' * 75
-    scenarios = {'1': [1e3, 5e6], '2': [1e3, 5e6], '4': [1e3, 5e6], '8': [1e3, 5e6]}
+    scenarios = {'1': [1e4, 5e7],
+                 '2': [1e4, 5e7],
+                 '3': [1e4, 5e7],
+                 '4': [1e4, 5e7],
+                 '5': [1e4, 5e7],
+                 '6': [1e4, 5e7]}
     for num_processes in scenarios:
         for N in scenarios[num_processes]:
             start = time.time()
             chunks = [int(ceil(N / int(num_processes)))] * int(num_processes)
             chunks[-1] = int(chunks[-1] - sum(chunks) + N)
             p = multiprocessing.Pool(int(num_processes))
-            option_price = p.map(eval_price_in_pool, chunks)
+            option_price = p.map(eval_in_pool, chunks)
             p.close()
             p.join()
             end = time.time()
