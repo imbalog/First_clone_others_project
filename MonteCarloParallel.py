@@ -58,6 +58,11 @@ class EuropeanOption(object):
     def value(self):
         pass
 
+    @abstractmethod
+    def delta(self):
+        pass
+
+
 class BlackScholes(EuropeanOption):
 
     def __init__(self, option_type, S0, strike, T, r, div, sigma):
@@ -83,6 +88,15 @@ class BlackScholes(EuropeanOption):
             value = (self.strike * np.exp(-self.r * self.T) * self.Nnd2 -
                      self.S0 * np.exp(-self.div * self.T) * self.Nnd1)
         return value
+
+    @property
+    def delta(self):
+        if self.option_type == 'call':
+            delta = np.exp(-self.div * self.T) * self.normal_d1
+        else:
+            delta = np.exp(-self.div * self.T) * (self.normal_d1 - 1)
+        return delta
+
 
 class MonteCarlo(EuropeanOption):
 
@@ -133,8 +147,16 @@ class MonteCarlo(EuropeanOption):
         payoff = self.generate_payoffs()
         return self.discount * np.sum(payoff) / float(len(payoff))
 
+    @property
+    def delta(self):
+        value_terminal = np.array(self.simulation_terminal() / float(self.S0))
+        payoff = self.generate_payoffs()
+        delta = np.zeros(len(payoff))
+        delta[np.nonzero(payoff)] = value_terminal[np.nonzero(payoff)]
+        return self.discount * np.sum(delta) / float(self.simulations)
 
-def eval_in_pool(simulations, method = 'value'):
+
+def eval_in_pool(simulations, method='value'):
     try:
         assert isinstance(simulations, int)
         if method is not None:
@@ -142,19 +164,15 @@ def eval_in_pool(simulations, method = 'value'):
     except ValueError:
         print 'Type in the parameters incorrect'
     myCall = MonteCarlo('call', 100., 100., .5, 0.01, 0., .35, simulations)
-    def eval_value():
-        return myCall.value
-    def eval_delta():
-        return myCall.delta
     if method == 'value':
-        return eval_value()
+        return myCall.value
     if method == 'delta':
-        return eval_delta()
+        return myCall.delta
 
 
 if __name__ == '__main__':
-    c = BlackScholes('call', 100., 100., .5, 0.01, 0., .35)
-    print 'BS Price:', c.value
+    call = BlackScholes('call', 100., 100., .5, 0.01, 0., .35)
+    print 'BS Price:', call.value
     print '-' * 75
     scenarios = {'1': [1e4, 5e7],
                  '2': [1e4, 5e7],
