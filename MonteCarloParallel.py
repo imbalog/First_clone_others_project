@@ -92,9 +92,9 @@ class BlackScholes(EuropeanOption):
     @property
     def delta(self):
         if self.option_type == 'call':
-            delta = np.exp(-self.div * self.T) * self.normal_d1
+            delta = np.exp(-self.div * self.T) * self.Nd1
         else:
-            delta = np.exp(-self.div * self.T) * (self.normal_d1 - 1)
+            delta = np.exp(-self.div * self.T) * (self.Nd1 - 1)
         return delta
 
 
