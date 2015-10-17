@@ -33,8 +33,8 @@ class EuropeanOption(object):
 			print('Error passing Options parameters')
 
 		models = ['BlackScholes', 'MonteCarlo',
-		          'BinomialTree', 'TrinomialTree',
-		          'FFT', 'PDE']
+				  'BinomialTree', 'TrinomialTree',
+				  'FFT', 'PDE']
 
 		if model not in models:
 			raise Exception('Error: Model unknown')
@@ -66,11 +66,11 @@ class EuropeanOption(object):
 class BlackScholes(EuropeanOption):
 	def __init__(self, option_type, S0, strike, T, r, div, sigma):
 		EuropeanOption.__init__(self, option_type, S0, strike,
-		                        T, r, div, sigma, 'BlackScholes')
+								T, r, div, sigma, 'BlackScholes')
 
 		d1 = ((np.log(self.S0 / self.strike) +
-		       (self.r - self.div + 0.5 * (self.sigma ** 2)) * self.T) /
-		      float(self.sigma * np.sqrt(self.T)))
+			   (self.r - self.div + 0.5 * (self.sigma ** 2)) * self.T) /
+			  float(self.sigma * np.sqrt(self.T)))
 		d2 = float(d1 - self.sigma * np.sqrt(self.T))
 		self.Nd1 = norm.cdf(d1, 0, 1)
 		self.Nnd1 = norm.cdf(-d1, 0, 1)
@@ -82,10 +82,10 @@ class BlackScholes(EuropeanOption):
 	def value(self):
 		if self.option_type == 'call':
 			value = (self.S0 * np.exp(-self.div * self.T) * self.Nd1 -
-			         self.strike * np.exp(-self.r * self.T) * self.Nd2)
+					 self.strike * np.exp(-self.r * self.T) * self.Nd2)
 		else:
 			value = (self.strike * np.exp(-self.r * self.T) * self.Nnd2 -
-			         self.S0 * np.exp(-self.div * self.T) * self.Nnd1)
+					 self.S0 * np.exp(-self.div * self.T) * self.Nnd1)
 		return value
 
 	@property
@@ -99,19 +99,20 @@ class BlackScholes(EuropeanOption):
 
 class MonteCarlo(EuropeanOption):
 	def __init__(self, simulations, option_type, S0, strike, T, r, div, sigma,
-	             antithetic=True,
-	             moment_matching=True,
-	             fixed_seed=True):
+				 antithetic=True,
+				 moment_matching=True,
+				 fixed_seed=True):
 		EuropeanOption.__init__(self, option_type, S0, strike, T, r, div, sigma, "MonteCarlo")
-		self.simulations = int(simulations)
-		self.antithetic = bool(antithetic)
-		self.moment_matching = bool(moment_matching)
-		self.fixed_seed = bool(fixed_seed)
 		try:
+			self.antithetic = bool(antithetic)
+			self.moment_matching = bool(moment_matching)
+			self.fixed_seed = bool(fixed_seed)
 			if self.simulations > 0:
-				assert isinstance(self.simulations, int)
+				self.simulations = int(simulations)
+			else:
+				raise ValueError("Simulation's number has to be positive integer")
 		except:
-			raise ValueError("Simulation's number has to be positive integer")
+			raise ValueError("Problem assigning types in MC arguments")
 
 	def simulation_terminal(self, seed=1234567890):
 		if self.fixed_seed:
@@ -127,8 +128,8 @@ class MonteCarlo(EuropeanOption):
 			brownian = brownian / np.std(brownian)
 
 		price_terminal = self.S0 * np.exp((self.r - self.div - 0.5 * self.sigma ** 2) *
-		                                  self.T +
-		                                  self.sigma * np.sqrt(self.T) * brownian)
+										  self.T +
+										  self.sigma * np.sqrt(self.T) * brownian)
 		return price_terminal
 
 	def generate_payoffs(self):
@@ -189,11 +190,11 @@ if __name__ == '__main__':
 	print 'BS Price:', call.value, 'BS Delta:', call.delta
 	print '-' * 85
 	scenarios = {'1': [1e4, 1e7],
-	             '2': [1e4, 1e7],
-	             '3': [1e4, 1e7],
-	             '4': [1e4, 1e7],
-	             '5': [1e4, 1e7],
-	             '6': [1e4, 1e7]}
+				 '2': [1e4, 1e7],
+				 '3': [1e4, 1e7],
+				 '4': [1e4, 1e7],
+				 '5': [1e4, 1e7],
+				 '6': [1e4, 1e7]}
 	for num_processes in scenarios:
 		for N in scenarios[num_processes]:
 			start = time.time()
